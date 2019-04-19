@@ -25,10 +25,10 @@ class TestSeedCLI(TestCase):
     @patch("flask_seeder.cli.os.walk", return_value=MOCK_FILES)
     def test_get_seed_scripts_return_list_of_modules(self, mocked):
         expected_result = [
-            "data.sub1.file1",
-            "data.sub1.file2",
-            "data.sub2.file3",
-            "data.sub2.file4",
+            os.path.join("data", "sub1", "file1.py"),
+            os.path.join("data", "sub1", "file2.py"),
+            os.path.join("data", "sub2", "file3.py"),
+            os.path.join("data", "sub2", "file4.py"),
         ]
 
         modules = cli.get_seed_scripts()
@@ -45,7 +45,7 @@ class TestSeedCLI(TestCase):
         m_seeder.run.assert_called_once()
 
     @patch("flask_seeder.cli.get_seed_scripts", return_value=["test"])
-    @patch("flask_seeder.cli.get_seeders_in_script")
+    @patch("flask_seeder.cli.get_seeders_from_script")
     def test_get_seeders_return_list_of_seeders(self, m_get_seeders, m_get_scripts):
         m_seeder = MagicMock()
         m_get_seeders.return_value = [m_seeder]
@@ -54,17 +54,6 @@ class TestSeedCLI(TestCase):
         result = cli.get_seeders()
 
         self.assertListEqual(result, expected_result)
-
-    @patch("flask_seeder.cli.inspect.getmembers")
-    def test_get_seeders_in_script_return_loaded_seeders(self, m_getmembers):
-        class TestSeeder(Seeder):
-            pass
-
-        m_getmembers.return_value = [["test", TestSeeder]]
-
-        result = cli.get_seeders_in_script("test")
-
-        self.assertIsInstance(result[0], TestSeeder)
 
     @patch("flask_seeder.cli.get_seeders")
     def test_seed_list_print_list_of_seeders(self, m_get_seeders):

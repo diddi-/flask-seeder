@@ -5,7 +5,7 @@ $ FLASK_APP=app flask seed <command>
 
 import os
 import re
-import importlib
+import importlib.util
 import inspect
 import click
 from flask.cli import with_appcontext
@@ -22,7 +22,7 @@ def get_seed_scripts(root="seeds"):
         root: Optional root directory to start walking (Default: "seeds")
 
     Returns:
-        Returns a list with python module paths in the format "package.module".
+        Returns a list with python file paths to found python scripts.
         If no files are found, and empty list is returned.
 
     """
@@ -33,19 +33,11 @@ def get_seed_scripts(root="seeds"):
             if not re.search(r"\."+extension+"$", filename):
                 continue
 
-            # Strip file extension
-            filename = re.sub(r"\."+extension+"$", "", filename)
-
             # Concat the full file path
             file_path = os.path.join(path, filename)
 
-            # Replace filesystem separator with python module separator
-            if os.path.sep == "\\":
-                mod_path = re.sub(r"\\", ".", file_path)
-            else:
-                mod_path = re.sub(os.path.sep, ".", file_path)
+            result.append(file_path)
 
-            result.append(mod_path)
     return result
 
 def inheritsfrom(child, parent):
@@ -86,8 +78,8 @@ def load_seeder(cls, name, mod_path, file_path):
 
     return seeder
 
-def get_seeders_in_script(script):
-    """ Get all seeders in a script file
+def get_seeders_from_script(script):
+    """ Get all seeders from a script file
 
     Reads a python script and detecs all classes within that inherits from the base Seeder class.
 
@@ -98,11 +90,14 @@ def get_seeders_in_script(script):
         Returns a list of loaded seeder objects from the script
     """
     seeders = []
-    module = importlib.import_module(script)
+    spec = importlib.util.spec_from_file_location("flask_seeder.seeder.ext", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
     members = inspect.getmembers(module, inspect.isclass)
     for member in members:
         if inheritsfrom(member[1], Seeder):
-            seeder = load_seeder(member[1], member[0], script, "")
+            seeder = load_seeder(member[1], member[0], "", script)
             seeders.append(seeder)
 
     return seeders
@@ -122,7 +117,7 @@ def get_seeders(root=None):
         scripts = get_seed_scripts()
 
     for script in scripts:
-        seeders.extend(get_seeders_in_script(script))
+        seeders.extend(get_seeders_from_script(script))
 
     return seeders
 
