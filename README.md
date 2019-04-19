@@ -1,4 +1,5 @@
 # Flask-Seeder
+[![Build Status](https://travis-ci.org/diddi-/flask-seeder.svg?branch=master)](https://travis-ci.org/diddi-/flask-seeder)
 
 Flask-Seeder is a Flask extension to help with seeding database with initial data, for example when deploying an application for the first time.
 
