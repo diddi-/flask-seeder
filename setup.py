@@ -15,9 +15,9 @@ setup(
     long_description=__doc__,
     packages=['flask_seeder'],
     include_package_data=True,
-    license = "MIT",
+    license="MIT",
     install_requires=[
-        "Flask",
+        "Flask>=1.0.2",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
