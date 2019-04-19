@@ -1,10 +1,13 @@
 [run]
-omit        = */__init__.py
-              tests/*
-              setup.py
+omit = */__init__.py
+       tests/*
+       setup.py
+
+include = flask_seeder/*
+
 
 [xml]
-output      = coverage.xml
+output = coverage.xml
 
 [report]
 fail_under = 90

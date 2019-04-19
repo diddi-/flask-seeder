@@ -12,3 +12,5 @@ instance/
 coverage.xml
 nose2-junit.xml
 \.pytest_cache
+\.tox
+\.coverage\.*

@@ -1,23 +1,23 @@
 """
-Flask-Script-Seed
+Flask-Seeder
 -------------
 
 """
 from setuptools import setup
 
 setup(
-    name="Flask-Script-Seed",
+    name="Flask-Seeder",
     version="0.0.1",
-    url="",
+    url="https://github.com/diddi-/flask-seeder",
     author="Diddi Oscarsson",
-    author_email="diddi.oscarsson@telenor.se",
+    author_email="diddi@diddi.se",
     description="Flask extension to seed database through scripts",
     long_description=__doc__,
     packages=['flask_seeder'],
     include_package_data=True,
+    license = "MIT",
     install_requires=[
         "Flask",
-        "Flask-SQLAlchemy"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
