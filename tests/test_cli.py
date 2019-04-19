@@ -100,3 +100,13 @@ class TestSeedCLI(TestCase):
         self.cli.invoke(cli.seed_run, args=["--root", "sub1"])
 
         m_get_seeders.assert_called_once_with(root="sub1")
+
+    @patch("flask_seeder.cli.get_seeders")
+    def test_run_with_seeder_argument(self, m_get_seeders):
+        m_seeder = MagicMock()
+        m_seeder.name = "TestSeeder"
+        m_get_seeders.return_value = [m_seeder]
+
+        self.cli.invoke(cli.seed_run, args=["TestSeeder"])
+
+        m_seeder.run.assert_called_once()

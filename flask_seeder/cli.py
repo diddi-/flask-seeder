@@ -133,9 +133,17 @@ def seed():
 
 @seed.command("run")
 @click.option("--root", default="seeds", type=click.Path(), help="Root directory for seed scripts")
+@click.argument("seeders", nargs=-1)
 @with_appcontext
-def seed_run(root):
-    """ Run database seeders """
+def seed_run(root, seeders):
+    """ Run database seeders
+
+    Any optional arguments after the options will be treated as a list of seeders to run,
+    for example:
+
+        $ flask seed run DemoSeeder AnotherDemoSeeder
+
+    """
     click.echo("Running database seeders")
     db = None
     try:
@@ -144,6 +152,9 @@ def seed_run(root):
         raise RuntimeError("Flask-Seeder not initialized!")
 
     for seeder in get_seeders(root=root):
+        if seeders and seeder.name not in seeders:
+            continue
+
         seeder.db = db
         try:
             seeder.run()
