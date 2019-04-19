@@ -153,9 +153,10 @@ def seed_run(root, seeders):
         seeder.db = db
         try:
             seeder.run()
-        # pylint: disable=bare-except
-        except:
+        # pylint: disable=broad-except,invalid-name
+        except Exception as e:
             click.echo("%s...\t[ERROR]" % seeder.name)
+            click.echo("\t%s" % e)
             continue
 
         click.echo("%s...\t[OK]" % seeder.name)
