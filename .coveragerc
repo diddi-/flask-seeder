@@ -1,0 +1,10 @@
+[run]
+omit        = */__init__.py
+              tests/*
+              setup.py
+
+[xml]
+output      = coverage.xml
+
+[report]
+fail_under = 90
