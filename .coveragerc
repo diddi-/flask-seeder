@@ -4,10 +4,3 @@ omit = */__init__.py
        setup.py
 
 include = flask_seeder/*
-
-
-[xml]
-output = coverage.xml
-
-[report]
-fail_under = 90
