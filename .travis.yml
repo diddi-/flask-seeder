@@ -1,13 +1,20 @@
+deploy:
+  provider: pypi
+  user: diddi
+  password:
+    secure: "evQEyS53Nc848B8i82hyCneUcl/i15Ca4S6o1UFQ9OZp+PVXxE7vviRZCpDs7gLrSd59Qp9DZxHUq5QCrTrPH3/bqUN6qhoitwEWPUnQSTDozkfd3Br4JVD9kr4jh26QKPdO4jhC0df7ein3oUAVxbR4c70aCxZfXc9bJiWHVdF96rwXJU0ldA7wiqNkKLyc6F4mvTV2RJeFn2uzrrMPtcrtpBrtt3OmIMXdAmeZ61WO5I+9aBTrd5mMwlSK6QB0JLKJ5YTjGGXQxX/kWhXTUCXWgGj2Cjj/A+taZeXdUnoQwhZhl/2WFUCRHIpk9xtmhQf3aXjz21UOOxZAHSxrGfLoMdng1+sqX/1EXhrwqmoAF6l6lzlMjVnTmr3BbfwL4QmO8S+Utj+57lChGcJckmOxtZ+2MRy9CNCS6Kwmx2xZcIftbZC9moJNOnpEOoEfn6N2X7kQ4YtZdpW5ANrjjBJo2XdeulbDe4YzBpxgg/cqvoZUJRKpZ/0NPjalqJ7UAlRif95yolaLPDnAN1ELTe/ZaobRbRq4isW9R8/W/1nbiZsC4Swn6kRXlW3EudyNdtQvGt5UjmivfMIsEC6iMQse8mjjNrrVIFiGrCiQTtrrRAO0RqmqcJ5D6KDIKxOkV6XAtKLyqU8/Q2w/X8Miqz/VlATar8F+M1JEoL/NBD8="
+  on:
+    tags: true
+    python: 3.6
+  distributions: sdist bdist_wheel
+
 dist: xenial
 language: python
 python:
   - 3.6
   - 3.7
-
 install:
   - pip install -U tox tox-travis coveralls
-
 script: tox
-
 after_success:
   - coveralls

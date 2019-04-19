@@ -1,9 +1,7 @@
-"""
-Flask-Seeder
--------------
-
-"""
 from setuptools import setup
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
     name="Flask-Seeder",
@@ -12,7 +10,8 @@ setup(
     author="Diddi Oscarsson",
     author_email="diddi@diddi.se",
     description="Flask extension to seed database through scripts",
-    long_description=__doc__,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=['flask_seeder'],
     include_package_data=True,
     license="MIT",
