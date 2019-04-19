@@ -22,7 +22,6 @@ class TestSeedCLI(TestCase):
         self.seeder = FlaskSeeder()
         self.seeder.init_app(self.app)
 
-
     @patch("flask_seeder.cli.os.walk", return_value=MOCK_FILES)
     def test_get_seed_scripts_return_list_of_modules(self, mocked):
         expected_result = [
@@ -87,3 +86,17 @@ class TestSeedCLI(TestCase):
         result = self.cli.invoke(cli.seed_run)
 
         self.assertTrue("ERROR" in result.output)
+
+    @patch("flask_seeder.cli.get_seeders")
+    def test_root_option_with_list(self, m_get_seeders):
+
+        self.cli.invoke(cli.seed_list, args=["--root", "sub1"])
+
+        m_get_seeders.assert_called_once_with(root="sub1")
+
+    @patch("flask_seeder.cli.get_seeders")
+    def test_root_option_with_run(self, m_get_seeders):
+
+        self.cli.invoke(cli.seed_run, args=["--root", "sub1"])
+
+        m_get_seeders.assert_called_once_with(root="sub1")

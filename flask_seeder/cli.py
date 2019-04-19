@@ -107,7 +107,7 @@ def get_seeders_in_script(script):
 
     return seeders
 
-def get_seeders():
+def get_seeders(root=None):
     """ Get all seeders from all scripts
 
     Finds all python scripts with seeders, loads them and return them.
@@ -116,12 +116,15 @@ def get_seeders():
         List of loaded seeder objects
     """
     seeders = []
-    scripts = get_seed_scripts()
+    if root is not None:
+        scripts = get_seed_scripts(root=root)
+    else:
+        scripts = get_seed_scripts()
+
     for script in scripts:
         seeders.extend(get_seeders_in_script(script))
 
     return seeders
-
 
 
 @click.group()
@@ -129,18 +132,18 @@ def seed():
     """ Database seed commands """
 
 @seed.command("run")
+@click.option("--root", default="seeds", type=click.Path(), help="Root directory for seed scripts")
 @with_appcontext
-def seed_run():
+def seed_run(root):
     """ Run database seeders """
     click.echo("Running database seeders")
     db = None
     try:
         db = app.extensions["flask_seeder"].db
     except KeyError:
-        click.echo("Flask-Seeder not initialized yet!")
-        return
+        raise RuntimeError("Flask-Seeder not initialized!")
 
-    for seeder in get_seeders():
+    for seeder in get_seeders(root=root):
         seeder.db = db
         try:
             seeder.run()
@@ -153,7 +156,8 @@ def seed_run():
 
 
 @seed.command("list")
-def seed_list():
+@click.option("--root", default="seeds", type=click.Path(), help="Root directory for seed scripts")
+def seed_list(root):
     """ List all discoverable seeders """
-    for seeder in get_seeders():
+    for seeder in get_seeders(root=root):
         click.echo("* %s" % seeder.name)
