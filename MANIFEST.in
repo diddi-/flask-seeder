@@ -1,0 +1,6 @@
+graft flask_seeder/data/*
+graft tests
+include .coveragerc
+include tox.ini
+include .pylintrc
+global-exclude */__pycache__/*

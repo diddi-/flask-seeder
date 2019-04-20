@@ -20,6 +20,16 @@ By subclassing `Seeder` and implementing a `run()` method you get access to the 
 
 All seeders must be somewhere in the `seeds/` directory and inherit from `Seeder` or else they won't be detected.
 
+# Faker and Generators
+Flask-Seeder provides a `Faker` class that controls the creation of fake objects, based on real models. By telling `Faker` how to create the objects, you can easily create many different unique objects to help when seeding the database.
+
+There are different generators that help generate values for the fake objects.
+Currently supported generators are:
+* Integer: Create a random integer between two values
+* Name: Create a random name from a list `data/names/names.txt`
+
+Feel free to roll your own generator by subclassing `Generator` and implement a `generate()` method that return the generated value.
+
 # Example usage
 Examples show only relevant snippets of code
 
@@ -43,14 +53,32 @@ create_app():
 
 **seeds/demo.py:**
 ```python
-from flask_seeder import Seeder
+from flask_seeder import Seeder, Faker, generator
+
+# SQLAlchemy database model
+class User(Base):
+  def __init__(self, name=None, age=None):
+    self.name = name
+    self.age = age
+
 
 # All seeders inherit from Seeder
 class DemoSeeder(Seeder):
 
-  # run() will be called by Flask-Seeder after instantiating the class
+  # run() will be called by Flask-Seeder
   def run(self):
-    self.db.session.add(...) # Standard SQLAlchemy add
+    # Create a new Faker and tell it how to create User objects
+    faker = Faker(
+      cls=User,
+      init={
+        "name": generator.Name(),
+        "age": generator.Integer(start=20, end=100)
+      }
+    )
+
+    # Create 5 users
+    for user in faker.create(5):
+      self.db.session.add(user)
     self.db.session.commit()
 ```
 

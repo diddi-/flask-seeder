@@ -1,7 +1,7 @@
 """ Flask-Seeder """
 
 from .seeder import Seeder
-
+from .faker import Faker
 
 # pylint: disable=too-few-public-methods
 class SeedConfig:

@@ -1,18 +1,18 @@
-from setuptools import setup
+import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(
+setuptools.setup(
     name="Flask-Seeder",
     version="0.1a1",
     url="https://github.com/diddi-/flask-seeder",
-    author="Diddi Oscarsson",
+    author="Diddi Oskarsson",
     author_email="diddi@diddi.se",
     description="Flask extension to seed database through scripts",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=['flask_seeder'],
+    packages=setuptools.find_packages(),
     include_package_data=True,
     license="MIT",
     install_requires=[
