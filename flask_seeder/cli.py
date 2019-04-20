@@ -127,7 +127,9 @@ def seed():
     """ Database seed commands """
 
 @seed.command("run")
-@click.option("--root", default="seeds", type=click.Path(), help="Root directory for seed scripts")
+@click.option("--root", default="seeds", type=click.Path(),
+              help="Root directory for seed scripts",
+              envvar="FLASK_SEEDER_ROOT")
 @click.argument("seeders", nargs=-1)
 @with_appcontext
 def seed_run(root, seeders):
@@ -163,7 +165,9 @@ def seed_run(root, seeders):
 
 
 @seed.command("list")
-@click.option("--root", default="seeds", type=click.Path(), help="Root directory for seed scripts")
+@click.option("--root", default="seeds", type=click.Path(),
+              help="Root directory for seed scripts",
+              envvar="FLASK_SEEDER_ROOT")
 def seed_list(root):
     """ List all discoverable seeders """
     for seeder in get_seeders(root=root):
