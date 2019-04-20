@@ -20,6 +20,8 @@ By subclassing `Seeder` and implementing a `run()` method you get access to the 
 
 All seeders must be somewhere in the `seeds/` directory and inherit from `Seeder` or else they won't be detected.
 
+When all seeders have completed (successfully or not), Flask-Seeder will by default commit all changes to the database. This behaviour can be overridden with `--no-commit` or setting environment variable `FLASK_SEEDER_AUTOCOMMIT=0`.
+
 # Faker and Generators
 Flask-Seeder provides a `Faker` class that controls the creation of fake objects, based on real models. By telling `Faker` how to create the objects, you can easily create many different unique objects to help when seeding the database.
 
@@ -58,10 +60,13 @@ from flask_seeder import Seeder, Faker, generator
 
 # SQLAlchemy database model
 class User(Base):
-  def __init__(self, name=None, age=None):
+  def __init__(self, id_num=None, name=None, age=None):
+    self.id_num = id_num
     self.name = name
     self.age = age
 
+  def __str__(self):
+    return "ID=%d, Name=%s, Age=%d" % (self.id_num, self.name, self.age)
 
 # All seeders inherit from Seeder
 class DemoSeeder(Seeder):
@@ -72,6 +77,7 @@ class DemoSeeder(Seeder):
     faker = Faker(
       cls=User,
       init={
+        "id_num": generator.Sequence(),
         "name": generator.Name(),
         "age": generator.Integer(start=20, end=100)
       }
@@ -79,13 +85,19 @@ class DemoSeeder(Seeder):
 
     # Create 5 users
     for user in faker.create(5):
+      print("Adding user: %s" % user)
       self.db.session.add(user)
-    self.db.session.commit()
 ```
 
 ***Shell***
 ```bash
 $ flask seed run
 Running database seeders
+Adding user: ID=1, Name=Fancie, Age=76
+Adding user: ID=2, Name=Shela, Age=22
+Adding user: ID=3, Name=Jo, Age=33
+Adding user: ID=4, Name=Laureen, Age=54
+Adding user: ID=5, Name=Tandy, Age=66
 DemoSeeder... [OK]
+Committing to database!
 ```

@@ -130,9 +130,12 @@ def seed():
 @click.option("--root", default="seeds", type=click.Path(),
               help="Root directory for seed scripts",
               envvar="FLASK_SEEDER_ROOT")
+@click.option("--commit/--no-commit", default=True,
+              help="Commit changes to database after seeding",
+              envvar="FLASK_SEEDER_AUTOCOMMIT")
 @click.argument("seeders", nargs=-1)
 @with_appcontext
-def seed_run(root, seeders):
+def seed_run(root, commit, seeders):
     """ Run database seeders
 
     Any optional arguments after the options will be treated as a list of seeders to run,
@@ -162,6 +165,13 @@ def seed_run(root, seeders):
             continue
 
         click.echo("%s...\t[OK]" % seeder.name)
+
+    if not commit:
+        click.echo("Not committing changes to database!")
+        return
+
+    click.echo("Committing to database!")
+    db.session.commit()
 
 
 @seed.command("list")

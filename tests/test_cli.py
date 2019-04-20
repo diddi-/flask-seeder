@@ -17,10 +17,12 @@ MOCK_FILES = [
 class TestSeedCLI(TestCase):
 
     def setUp(self):
+        self.db_mock = MagicMock()
+
         self.app = Flask("test")
         self.cli = self.app.test_cli_runner()
         self.seeder = FlaskSeeder()
-        self.seeder.init_app(self.app)
+        self.seeder.init_app(self.app, db=self.db_mock)
 
     @patch("flask_seeder.cli.os.walk", return_value=MOCK_FILES)
     def test_get_seed_scripts_return_list_of_modules(self, mocked):
@@ -99,3 +101,15 @@ class TestSeedCLI(TestCase):
         self.cli.invoke(cli.seed_run, args=["TestSeeder"])
 
         m_seeder.run.assert_called_once()
+
+    @patch("flask_seeder.cli.get_seeders", return_value=[])
+    def test_run_commit_session_by_default(self, m_get_seeders):
+        self.cli.invoke(cli.seed_run)
+
+        self.db_mock.session.commit.assert_called()
+
+    @patch("flask_seeder.cli.get_seeders", return_value=[])
+    def test_run_avoid_commit_with_no_commit_option(self, m_get_seeders):
+        self.cli.invoke(cli.seed_run, args=["--no-commit"])
+
+        self.assertFalse(self.db_mock.session.commit.called)
