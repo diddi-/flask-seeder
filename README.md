@@ -30,6 +30,7 @@ Currently supported generators are:
 * Integer: Create a random integer between two values
 * Sequence: Create integers in sequence if called multiple times
 * Name: Create a random name from a list `data/names/names.txt`
+* String: String generation from a pattern
 
 Feel free to roll your own generator by subclassing `Generator` and implement a `generate()` method that return the generated value.
 
