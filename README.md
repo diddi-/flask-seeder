@@ -34,6 +34,25 @@ Currently supported generators are:
 
 Feel free to roll your own generator by subclassing `Generator` and implement a `generate()` method that return the generated value.
 
+## String generator pattern
+The `String` generator takes a pattern and produces a string that matches the pattern.
+Currently the generator pattern is very simple and supports only a handful of operations.
+
+| Pattern | Produces | Description | Example |
+| --| -- | -- | -- |
+| [abc] | String character | Randomly select one of the provided characters | `b` |
+| [a-k] | String character | Randomly select one character from a range | `i` |
+| \c | String character | Randomly select any alpha character (a-z, A-Z) | `B` |
+| \d | Digit | Randomly select a single digit (0-9) | `8` |
+| \d{5} | Quantifier | Repeats the previous pattern | `54678` |
+| abc | String literal | No processing, returned as is | `abc` |
+
+Patterns can also be combined to produce more complex strings.
+```
+# Produces something like: abc5586oz
+abc[5-9]{4}\c[xyz]
+```
+
 # Example usage
 Examples show only relevant snippets of code
 
