@@ -43,7 +43,7 @@ Currently the generator pattern is very simple and supports only a handful of op
 | [abc] | String character | Randomly select one of the provided characters | `b` |
 | [a-k] | String character | Randomly select one character from a range | `i` |
 | \c | String character | Randomly select any alpha character (a-z, A-Z) | `B` |
-| (one\|two) | String group | Like `[abc]` but works for strings, not use single characters | `one` |
+| (one\|two) | String group | Like `[abc]` but works for strings, not just single characters | `one` |
 | \d | Digit | Randomly select a single digit (0-9) | `8` |
 | {x} | Repeater | Repeat the previous pattern `x` times | `\d{5}` |
 | {m,n} | Repeater | Repeat the previous pattern `x` times where `x` is anywhere between `m` and `n` | `[0-9]{2,8}` |
