@@ -8,8 +8,7 @@ class TestStringGenerator(TestCase):
     def setUp(self):
         self.generator = String()
 
-    @patch("flask_seeder.generator.substr_replace", return_value="4")
-    def test_integer_range_produce_character_from_valid_range(self, m_substr):
+    def test_integer_range_produce_character_from_valid_range(self):
         m_rnd = MagicMock()
         self.generator.rnd = m_rnd
         self.generator.pattern = "[4-6]"
@@ -18,8 +17,7 @@ class TestStringGenerator(TestCase):
 
         m_rnd.choice.assert_called_once_with("456")
 
-    @patch("flask_seeder.generator.substr_replace", return_value="i")
-    def test_string_rane_produce_character_from_valid_range(self, m_substr):
+    def test_string_range_produce_character_from_valid_range(self):
         m_rnd = MagicMock()
         self.generator.rnd = m_rnd
         self.generator.pattern = "[i-o]"
@@ -28,24 +26,12 @@ class TestStringGenerator(TestCase):
 
         m_rnd.choice.assert_called_once_with("ijklmno")
 
-    def test_invalid_range_raise_ValueError(self):
-        self.generator.pattern = "[0-z]"
-
-        with self.assertRaises(ValueError):
-            self.generator.generate()
-
-    def test_inverse_range_raise_ValueError(self):
-        self.generator.pattern = "[9-0]"
-
-        with self.assertRaises(ValueError):
-            self.generator.generate()
-
     def test_integer_range_pattern(self):
         self.generator.pattern = "[0-9]"
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^\d$")
+        self.assertRegex(string, r"^\d$")
 
     def test_string_range_pattern(self):
         self.generator.pattern = "[a-z]"
@@ -59,21 +45,21 @@ class TestStringGenerator(TestCase):
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^\d{5}$")
+        self.assertRegex(string, r"^\d{5}$")
 
     def test_multiple_range_patterns(self):
         self.generator.pattern = "[0-9][a-c]"
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^\d[a-c]$")
+        self.assertRegex(string, r"^\d[a-c]$")
 
     def test_multiple_range_patterns_with_quantifiers(self):
         self.generator.pattern = "[0-9]{4}[x-z]{2}"
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^\d{4}[x-z]{2}$")
+        self.assertRegex(string, r"^\d{4}[x-z]{2}$")
 
 
     def test_integer_character_code(self):
@@ -81,7 +67,7 @@ class TestStringGenerator(TestCase):
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^\d$")
+        self.assertRegex(string, r"^\d$")
 
     def test_string_character_code(self):
         self.generator.pattern = r"\c"
@@ -95,7 +81,7 @@ class TestStringGenerator(TestCase):
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^\d{3}$")
+        self.assertRegex(string, r"^\d{3}$")
 
     def test_oneof_pattern(self):
         self.generator.pattern = r"[aoueiy]"
@@ -116,4 +102,31 @@ class TestStringGenerator(TestCase):
 
         string = self.generator.generate()
 
-        self.assertRegex(string, "^abc\d{4}[i-m]{2}[qwerty]xyz$")
+        self.assertRegex(string, r"^abc\d{4}[i-m]{2}[qwerty]xyz$")
+
+    def test_charcode_with_quantifier_range(self):
+        self.generator.pattern = r"\c{1,2}"
+
+        string = self.generator.generate()
+
+        self.assertRegex(string, "[a-zA-Z]{1,2}")
+
+    def test_invalid_charcode_raise_ValueError(self):
+        self.generator.pattern = r"\q"
+
+        with self.assertRaises(ValueError):
+            self.generator.generate()
+
+    def test_string_group(self):
+        self.generator.pattern = r"(one|two)"
+
+        string = self.generator.generate()
+
+        self.assertRegex(string, r"(one|two)")
+
+    def test_number(self):
+        self.generator.pattern = r"123"
+
+        string = self.generator.generate()
+
+        self.assertEqual(string, "123")

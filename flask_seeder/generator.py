@@ -1,8 +1,9 @@
 """ Generators module """
 
-import re
 import random
 import pkg_resources
+
+from flask_seeder.parser import SGParser, Tokenizer
 
 def resource_path(path):
     """ Get the resource path
@@ -32,30 +33,6 @@ def read_resource(path):
         lines = source.read().splitlines()
 
     return lines
-
-def substr_replace(string, startpos, endpos, new):
-    """ Replace part of string with new string
-
-    Beginning at startpos, replace everything up to endpos
-    with the new string. Note that new string can be different size.
-
-    Arguments:
-        string: Original string
-        startpos: Where to begin replace in string. Strings begin at position zero.
-        endpos: Where to end replace in string. Strings end at len(string).
-        new: New string to replace with
-
-    Returns:
-        Returns a new string with the value of new string inserted between startpos and endpos
-
-    Example:
-        # Hello awesome replacer
-        substr_replace("Hello World", 6, 11, "awesome replacer")
-    """
-    s_before = string[:startpos]
-    s_after = string[endpos:]
-
-    return s_before + new + s_after
 
 def slicer(string, start, end):
     """ Slice a string
@@ -102,8 +79,8 @@ class Generator:
     """
     def __init__(self, rnd=None):
         self.rnd = rnd or random
-        self.ascii_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        self.integers = "0123456789"
+        self.alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        self.digit = "0123456789"
 
     def generate(self):
         """ Generate data
@@ -212,96 +189,123 @@ class String(Generator):
     See docs for details.
     """
 
-    def __init__(self, pattern=None, **kwargs):
+    def __init__(self, pattern=None, parser=None, **kwargs):
         super().__init__(**kwargs)
         self.pattern = pattern
+        self.parser = parser or self._create_parser()
 
-        self.regex = re.compile(r"""
-            (?P<character>\\[cd](\{\d\})?)
-            | (?P<range>\[[\w]-[\w]\](\{\d\})?)
-            | (?P<oneof>\[\w+\](\{\d\})?)
-        """, re.VERBOSE)
+    def _create_parser(self): # pylint: disable=no-self-use
+        tokenizer = Tokenizer()
+        return SGParser(tokenizer=tokenizer)
 
-    def _character(self, fmt):
-        """ Generate a single character """
-        (character, quantifier) = re.match(r"\\([cd])(?:\{(\d)\})?", fmt).groups()
-        if quantifier is None:
-            quantifier = 1
-        else:
-            quantifier = int(quantifier)
+    def _range(self, quantifier):
+        """ Create a range from quantifier
 
+        There are two types of quantifiers
+
+        QUANTIFIER: Repeat X times
+        QUANTIFIER_RANGE: Repeat X times, where X is anywhere between start and end
+
+        Returns:
+            Python built in range() with a size depending on quantifier type.
+        """
+        size = 1
+        if quantifier["type"] == "QUANTIFIER":
+            size = quantifier["value"]
+        elif quantifier["type"] == "QUANTIFIER_RANGE":
+            start = quantifier["value"]["start"]
+            end = quantifier["value"]["end"]
+            size = self.rnd.choice(list(range(start, end+1)))
+
+        return range(size)
+
+    def generate_CHARCODE(self, node): # pylint: disable=invalid-name
+        """ Generate CHARCODE string
+
+        Generates a string depending on the CHARCODE:
+            "c": Character/alpha
+            "d": Digit
+        """
         result = ""
-        for _ in range(quantifier):
-            if character == "c":
-                result += self.rnd.choice(self.ascii_characters)
+
+        for _ in self._range(node["repeat"]):
+            if node["value"] == "c":
+                result += self.rnd.choice(self.alpha)
+            elif node["value"] == "d":
+                result += self.rnd.choice(self.digit)
             else:
-                result += self.rnd.choice(self.integers)
+                raise ValueError("Invalid CHARCODE %s" % node["value"])
 
         return result
 
-    def _range(self, fmt):
-        """ Generate a single character from a range """
-        (start, end, quantifier) = re.match(r"\[(.)-(.)\](?:\{(\d)\})?", fmt).groups()
-        if quantifier is None:
-            quantifier = 1
-        else:
-            quantifier = int(quantifier)
+    def generate_ONEOF(self, node): # pylint: disable=invalid-name
+        """ Generate one from list
 
-        # Comparing start and end as string characters means
-        # the comparison work for both letters and integers
-        if start >= end:
-            raise ValueError("Inversed range start and end")
-
-        characters = ""
-        if re.match(r"\d\d", start+end):
-            # Integer range
-            characters = slicer(self.integers, start, end)
-        elif re.match(r"[a-zA-Z][a-zA-Z]", start+end):
-            # Letter range
-            characters = slicer(self.ascii_characters, start, end)
-        else:
-            raise ValueError("Invalid range")
-
+        Returns a value from a list of valid values
+        """
         result = ""
-        for _ in range(quantifier):
-            result += self.rnd.choice(characters)
+
+        for _ in self._range(node["repeat"]):
+            result += self.rnd.choice(node["value"])
 
         return result
 
-    def _oneof(self, fmt):
-        (characters, quantifier) = re.match(r"\[(\w+)\](?:\{(\d)\})?", fmt).groups()
-        if quantifier is None:
-            quantifier = 1
-        else:
-            quantifier = int(quantifier)
+    def generate_RANGE(self, node): # pylint: disable=invalid-name
+        """ Generate a range of values
 
+        Generates, in sequence, a number of alpha or digit characters.
+        """
         result = ""
-        for _ in range(quantifier):
-            result += self.rnd.choice(characters)
+        start = node["value"]["start"]
+        end = node["value"]["end"]
+
+        source = self.alpha
+        if str.isdigit(start):
+            source = self.digit
+
+        for _ in self._range(node["repeat"]):
+            choices = slicer(source, start, end)
+            result += self.rnd.choice(choices)
 
         return result
+
+    def generate_STRING_GROUP(self, node): # pylint: disable=invalid-name
+        """ Generate a string form a list of strings """
+        result = ""
+
+        for _ in self._range(node["repeat"]):
+            result += self.rnd.choice(node["value"])
+
+        return result
+
+    def generate_NUMBER(self, node): # pylint: disable=invalid-name
+        """ Generate number literal """
+        result = ""
+
+        for _ in self._range(node["repeat"]):
+            result += str(node["value"])
+
+        return result
+
+    def generate_STRING(self, node): # pylint: disable=invalid-name, no-self-use
+        """ Generate string literal """
+        return node["value"]
+
+    def generate_LITERAL(self, node): # pylint: disable=invalid-name, no-self-use
+        """ Generate literal """
+        return node["value"]
 
     def generate(self):
-        """ Generate string from pattern """
+        """ Generate a string based on pattern """
+        ast = self.parser.parse(self.pattern)
+        result = ""
 
-        # Pattern contains all literals so use it as a base
-        string = self.pattern
+        for node in ast:
+            function_name = "generate_" + node["type"]
+            if not hasattr(self, function_name):
+                raise NotImplementedError("Unknown node type %s" % node["type"])
 
-        match = re.search(self.regex, string)
-        while match:
-            fmt = match.group()
-            group = match.lastgroup
+            func = getattr(self, function_name)
+            result += func(node)
 
-            # We know there is a match and it must be one of
-            # these group names
-            if group == "character":
-                result = self._character(fmt)
-            elif group == "range":
-                result = self._range(fmt)
-            elif group == "oneof":
-                result = self._oneof(fmt)
-
-            string = substr_replace(string, match.start(), match.end(), result)
-            match = re.search(self.regex, string)
-
-        return string
+        return result

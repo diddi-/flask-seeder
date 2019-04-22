@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, mock_open
 
-from flask_seeder.generator import Generator, resource_path, read_resource, substr_replace, slicer
+from flask_seeder.generator import Generator, resource_path, read_resource, slicer
 
 MOCK_CONTENTS = "line1\nline2"
 
@@ -33,15 +33,6 @@ class TestGenerator(TestCase):
         result = read_resource("test")
 
         self.assertListEqual(result, expected)
-
-
-    def test_substr_replace_with_new_string(self):
-        original = "this is a string"
-        expected = "this was a string"
-
-        result = substr_replace(original, 5, 7, "was")
-
-        self.assertEqual(result, expected)
 
     def test_slicer_return_new_string(self):
         original = "abcdefghijklmnopqrstuvwxyz"
