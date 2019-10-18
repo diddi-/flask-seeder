@@ -1,4 +1,5 @@
 \.vscode/
+\.devcontainer/
 __pycache__/
 *.egg-info/
 build/

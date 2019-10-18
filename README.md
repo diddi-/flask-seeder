@@ -64,7 +64,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_seeder import FlaskSeeder
 
-create_app():
+def create_app():
   app = Flask(__name__)
 
   db = SQLAlchemy()
