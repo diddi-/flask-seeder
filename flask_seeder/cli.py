@@ -123,7 +123,7 @@ def get_seeders(root=None):
 
     priority_key = lambda s: getattr(s, "priority", float("inf"))
     sorted_seeders = (
-        sorted(g, key=priority_key)
+        sorted(g, key=lambda s: type(s).__name__)
         for k, g in groupby(sorted(seeders, key=priority_key), key=priority_key)
     )
 
