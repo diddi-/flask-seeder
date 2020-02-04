@@ -22,6 +22,26 @@ All seeders must be somewhere in the `seeds/` directory and inherit from `Seeder
 
 When all seeders have completed (successfully or not), Flask-Seeder will by default commit all changes to the database. This behaviour can be overridden with `--no-commit` or setting environment variable `FLASK_SEEDER_AUTOCOMMIT=0`.
 
+## Run Order
+
+When splitting seeders across multiple classes and files, order of operations is determined by two factors.
+First the seeders are grouped by `priority` (lower priority will be run first), all seeders with the same priority
+are then ordered by class name.
+
+See example below for setting priority on a seeder.
+
+```python
+from flask_seeder import Seeder
+
+class DemoSeeder(Seeder):
+  def __init__(self, db=None):
+    super().__init__(db=db)
+    self.priority = 10
+
+  def run(self):
+    ...
+```
+
 # Faker and Generators
 Flask-Seeder provides a `Faker` class that controls the creation of fake objects, based on real models. By telling `Faker` how to create the objects, you can easily create many different unique objects to help when seeding the database.
 

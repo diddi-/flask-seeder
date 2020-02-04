@@ -110,7 +110,7 @@ def get_seeders(root=None):
     Finds all python scripts with seeders, loads them and return them.
 
     Returns:
-        List of loaded seeder objects
+        Ordered list of loaded seeder objects based on priority and class name
     """
     seeders = []
     if root is not None:
