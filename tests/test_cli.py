@@ -48,12 +48,26 @@ class TestSeedCLI(TestCase):
 
     @patch("flask_seeder.cli.get_seed_scripts", return_value=["test"])
     @patch("flask_seeder.cli.get_seeders_from_script")
-    def test_get_seeders_return_list_of_seeders(self, m_get_seeders, m_get_scripts):
-        m_seeder = MagicMock()
-        m_get_seeders.return_value = [m_seeder]
-        expected_result = [m_seeder]
+    def test_get_seeders_return_ordered_iterable_of_seeders(self, m_get_seeders, m_get_scripts):
+        class TestSeeder:
+            def __init__(self, priority=None):
+                if priority:
+                    self.priority = priority
+        class QQTestSeeder:
+            def __init__(self, priority=None):
+                if priority:
+                    self.priority = priority
 
-        result = cli.get_seeders()
+        unordered_seeder_list = [TestSeeder(10), QQTestSeeder(), TestSeeder(), QQTestSeeder(1)]
+        m_get_seeders.return_value = unordered_seeder_list
+        expected_result = [
+            unordered_seeder_list[3],
+            unordered_seeder_list[0],
+            unordered_seeder_list[1],
+            unordered_seeder_list[2]
+        ]
+
+        result = list(cli.get_seeders())
 
         self.assertListEqual(result, expected_result)
 

@@ -7,6 +7,8 @@ import os
 import re
 import importlib.util
 import inspect
+from itertools import groupby, chain
+
 import click
 from flask.cli import with_appcontext
 from flask import current_app as app
@@ -108,7 +110,7 @@ def get_seeders(root=None):
     Finds all python scripts with seeders, loads them and return them.
 
     Returns:
-        List of loaded seeder objects
+        Ordered list of loaded seeder objects based on priority and class name
     """
     seeders = []
     if root is not None:
@@ -119,7 +121,13 @@ def get_seeders(root=None):
     for script in scripts:
         seeders.extend(get_seeders_from_script(script))
 
-    return seeders
+    priority_key = lambda s: getattr(s, "priority", float("inf"))
+    sorted_seeders = (
+        sorted(g, key=lambda s: type(s).__name__)
+        for k, g in groupby(sorted(seeders, key=priority_key), key=priority_key)
+    )
+
+    return chain.from_iterable(sorted_seeders)
 
 
 @click.group()
