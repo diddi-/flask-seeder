@@ -50,4 +50,4 @@ class FlaskSeeder:
         if not hasattr(app, 'extensions'):
             app.extensions = {}
 
-        app.extensions['flask_seeder'] = SeedConfig(db)
+        app.extensions['flask_seeder'] = SeedConfig(self.db)
