@@ -115,6 +115,22 @@ class Integer(Generator):
         """
         return self.rnd.randint(self.start, self.end)
 
+class Email(Generator):
+    """ Random Email generator """
+
+    def __init__(self, **kwargs):
+        """ Initialize generator """
+        super().__init__(**kwargs)
+        self._lines = None
+
+    def generate(self):
+        """ Generate a random email address """
+        if self._lines is None:
+            self._lines = read_resource("domains/domains.txt")
+
+        domain = self.rnd.choice(self._lines)
+
+        return "{}@{}".format(Name().generate(), domain)
 
 class Sequence(Generator):
     """ Sequence integer generator """
