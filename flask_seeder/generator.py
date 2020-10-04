@@ -128,9 +128,10 @@ class Email(Generator):
         if self._lines is None:
             self._lines = read_resource("domains/domains.txt")
 
+        name = Name().generate().lower()
         domain = self.rnd.choice(self._lines)
 
-        return "{}@{}".format(Name().generate(), domain)
+        return f"{name}@{domain}"
 
 class Sequence(Generator):
     """ Sequence integer generator """
