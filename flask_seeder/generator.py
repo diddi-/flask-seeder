@@ -121,15 +121,19 @@ class Email(Generator):
     def __init__(self, **kwargs):
         """ Initialize generator """
         super().__init__(**kwargs)
-        self._lines = None
+        self._names = None
+        self._domains = None
 
     def generate(self):
         """ Generate a random email address """
-        if self._lines is None:
-            self._lines = read_resource("domains/domains.txt")
+        if self._names is None:
+            self._names = read_resource("names/names.txt")
 
-        name = Name().generate().lower()
-        domain = self.rnd.choice(self._lines)
+        if self._domains is None:
+            self._domains = read_resource("domains/domains.txt")
+
+        name = self.rnd.choice(self._names).lower()
+        domain = self.rnd.choice(self._domains)
 
         return f"{name}@{domain}"
 

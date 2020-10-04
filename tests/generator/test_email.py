@@ -18,4 +18,5 @@ class TestEmailGenerator(TestCase):
     def test_generate_email(self, m_read_resource):
         result = self.generator.generate()
 
-        self.rnd_mock.choice.assert_called_once_with(MOCK_CONTENTS)
+        self.rnd_mock.choice.assert_called_with(MOCK_CONTENTS)
+        assert(self.rnd_mock.choice.call_count == 2)
