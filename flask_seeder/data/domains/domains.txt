@@ -1,0 +1,12 @@
+example.com
+flask-seeder.example
+flask-seeder.example.com
+flask-seeder.local
+flask-seeder.test
+flask.seeder.example
+flask.seeder.local
+flask.seeder.test
+seeder.example
+seeder.example.com
+seeder.local
+seeder.test
