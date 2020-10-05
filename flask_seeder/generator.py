@@ -1,9 +1,11 @@
 """ Generators module """
 
+import uuid
 import random
 import pkg_resources
 
 from flask_seeder.parser import SGParser, Tokenizer
+
 
 def resource_path(path):
     """ Get the resource path
@@ -16,6 +18,7 @@ def resource_path(path):
         Note that no validation is made to ensure the resource actually exist.
     """
     return pkg_resources.resource_filename("flask_seeder", "data/" + path)
+
 
 def read_resource(path):
     """ Read resource text file
@@ -33,6 +36,7 @@ def read_resource(path):
         lines = source.read().splitlines()
 
     return lines
+
 
 def slicer(string, start, end):
     """ Slice a string
@@ -66,6 +70,7 @@ def slicer(string, start, end):
 
     return None
 
+
 # pylint: disable=too-few-public-methods
 class Generator:
     """ Base Generator class
@@ -77,6 +82,7 @@ class Generator:
         ascii_characters: String with valid ascii characters
         integers: String with valid integers
     """
+
     def __init__(self, rnd=None):
         self.rnd = rnd or random
         self.alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -115,6 +121,13 @@ class Integer(Generator):
         """
         return self.rnd.randint(self.start, self.end)
 
+class UUID(Generator):
+    """ Random UUID generator """
+
+    def generate(self):
+        """ Generate a random UUID """
+        return uuid.uuid4()
+
 class Email(Generator):
     """ Random Email generator """
 
@@ -136,6 +149,7 @@ class Email(Generator):
         domain = self.rnd.choice(self._domains)
 
         return f"{name}@{domain}"
+
 
 class Sequence(Generator):
     """ Sequence integer generator """
@@ -177,6 +191,7 @@ class Sequence(Generator):
 
         return value
 
+
 # pylint: disable=too-few-public-methods
 class Name(Generator):
     """ Random Name generator """
@@ -198,6 +213,7 @@ class Name(Generator):
 
         return result
 
+
 class String(Generator):
     """ Generate string from pattern
 
@@ -215,7 +231,7 @@ class String(Generator):
         self.pattern = pattern
         self.parser = parser or self._create_parser()
 
-    def _create_parser(self): # pylint: disable=no-self-use
+    def _create_parser(self):  # pylint: disable=no-self-use
         tokenizer = Tokenizer()
         return SGParser(tokenizer=tokenizer)
 
@@ -236,11 +252,11 @@ class String(Generator):
         elif quantifier["type"] == "QUANTIFIER_RANGE":
             start = quantifier["value"]["start"]
             end = quantifier["value"]["end"]
-            size = self.rnd.choice(list(range(start, end+1)))
+            size = self.rnd.choice(list(range(start, end + 1)))
 
         return range(size)
 
-    def generate_CHARCODE(self, node): # pylint: disable=invalid-name
+    def generate_CHARCODE(self, node):  # pylint: disable=invalid-name
         """ Generate CHARCODE string
 
         Generates a string depending on the CHARCODE:
@@ -259,7 +275,7 @@ class String(Generator):
 
         return result
 
-    def generate_ONEOF(self, node): # pylint: disable=invalid-name
+    def generate_ONEOF(self, node):  # pylint: disable=invalid-name
         """ Generate one from list
 
         Returns a value from a list of valid values
@@ -271,7 +287,7 @@ class String(Generator):
 
         return result
 
-    def generate_RANGE(self, node): # pylint: disable=invalid-name
+    def generate_RANGE(self, node):  # pylint: disable=invalid-name
         """ Generate a range of values
 
         Generates, in sequence, a number of alpha or digit characters.
@@ -290,7 +306,7 @@ class String(Generator):
 
         return result
 
-    def generate_STRING_GROUP(self, node): # pylint: disable=invalid-name
+    def generate_STRING_GROUP(self, node):  # pylint: disable=invalid-name
         """ Generate a string form a list of strings """
         result = ""
 
@@ -299,7 +315,7 @@ class String(Generator):
 
         return result
 
-    def generate_NUMBER(self, node): # pylint: disable=invalid-name
+    def generate_NUMBER(self, node):  # pylint: disable=invalid-name
         """ Generate number literal """
         result = ""
 
@@ -308,11 +324,11 @@ class String(Generator):
 
         return result
 
-    def generate_STRING(self, node): # pylint: disable=invalid-name, no-self-use
+    def generate_STRING(self, node):  # pylint: disable=invalid-name, no-self-use
         """ Generate string literal """
         return node["value"]
 
-    def generate_LITERAL(self, node): # pylint: disable=invalid-name, no-self-use
+    def generate_LITERAL(self, node):  # pylint: disable=invalid-name, no-self-use
         """ Generate literal """
         return node["value"]
 
