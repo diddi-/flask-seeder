@@ -18,5 +18,5 @@ class TestUUIDGenerator(TestCase):
 
     def test_generate_uuid(self):
         result = self.generator.generate()
-
-        uuid.UUID(str(result), version=4)
+        
+        self.assertEqual(4, uuid.UUID(str(result), version=4).version)
