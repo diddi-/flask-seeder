@@ -1,5 +1,6 @@
 """ Generators module """
 
+import uuid
 import random
 import pkg_resources
 
@@ -114,6 +115,13 @@ class Integer(Generator):
             A single random integer from `start` to `end`.
         """
         return self.rnd.randint(self.start, self.end)
+
+class UUID(Generator):
+    """ Random UUID generator """
+
+    def generate(self):
+        """ Generate a random UUID """
+        return uuid.uuid4()
 
 class Email(Generator):
     """ Random Email generator """

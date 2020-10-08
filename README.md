@@ -49,6 +49,7 @@ There are different generators that help generate values for the fake objects.
 Currently supported generators are:
 
 * Integer: Create a random integer between two values
+* UUID: Create a random UUID
 * Sequence: Create integers in sequence if called multiple times
 * Name: Create a random name from a list `data/names/names.txt`
 * Email: Create a random email, a combination of the random name generator and a domain from `data/domains/domains.txt`
