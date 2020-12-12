@@ -16,3 +16,4 @@ nose2-junit.xml
 \.tox
 \.coverage\.*
 local/
+\.mypy_cache/

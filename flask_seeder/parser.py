@@ -2,7 +2,6 @@
 
 import re
 
-# pylint: disable=bad-whitespace
 TOKEN_MATCHERS = [
     ("CHARCODE",            r"\\([a-z])"),
     ("ONEOF",               r"\[([a-zA-Z0-9]+)\]"),
