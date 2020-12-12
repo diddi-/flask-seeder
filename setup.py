@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="Flask-Seeder",
-    version="1.1.1",
+    version="1.2.0",
     url="https://github.com/diddi-/flask-seeder",
     author="Diddi Oskarsson",
     author_email="diddi@diddi.se",
