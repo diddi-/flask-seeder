@@ -2,6 +2,7 @@
 
 import uuid
 import random
+from ipaddress import IPv4Address, IPv6Address
 import pkg_resources
 
 from flask_seeder.parser import SGParser, Tokenizer
@@ -338,3 +339,36 @@ class String(Generator):
             result += func(node)
 
         return result
+
+
+class IPv4(Generator):
+    """ Random IPv4 generator """
+    IPV4LENGTH = 32
+    IPV4_MAX_PREFIX_LEN = (2**IPV4LENGTH) - 1
+
+    def __init__(self, rnd=None, **kwargs):
+        super().__init__(**kwargs)
+        self.rnd = rnd or random
+
+    def generate(self):
+        """ Generate a random IPv4 address """
+
+        return str(IPv4Address(
+            self.rnd.randint(0, self.IPV4_MAX_PREFIX_LEN)
+        ))
+
+
+class IPv6(Generator):
+    """ Random IPv6 generator """
+    IPV6LENGTH = 128
+    IPV6_MAX_PREFIX_LEN = (2**IPV6LENGTH) - 1
+
+    def __init__(self, rnd=None, **kwargs):
+        super().__init__(**kwargs)
+        self.rnd = rnd or random
+
+    def generate(self):
+        """ Generate a random IPv6 address """
+        return str(IPv6Address(
+            self.rnd.randint(0, self.IPV6_MAX_PREFIX_LEN)
+        ))

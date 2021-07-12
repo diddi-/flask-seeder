@@ -53,6 +53,7 @@ Currently supported generators are:
 * Sequence: Create integers in sequence if called multiple times
 * Name: Create a random name from a list `data/names/names.txt`
 * Email: Create a random email, a combination of the random name generator and a domain from `data/domains/domains.txt`
+* IPv4/IPv6: Create a random IPv4 or Ipv6 address
 * String: String generation from a pattern
 
 Feel free to roll your own generator by subclassing `Generator` and implement a `generate()` method that return the generated value.
