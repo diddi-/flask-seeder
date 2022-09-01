@@ -106,13 +106,14 @@ from flask_seeder import Seeder, Faker, generator
 
 # SQLAlchemy database model
 class User(Base):
-  def __init__(self, id_num=None, name=None, age=None):
+  def __init__(self, id_num=None, name=None, age=None,gender=None):
     self.id_num = id_num
     self.name = name
     self.age = age
+    self.gender = gender
 
   def __str__(self):
-    return "ID=%d, Name=%s, Age=%d" % (self.id_num, self.name, self.age)
+    return "ID=%d, Name=%s, Age=%d, Gender=%s" % (self.id_num, self.name, self.age, self.gender)
 
 # All seeders inherit from Seeder
 class DemoSeeder(Seeder):
@@ -125,7 +126,8 @@ class DemoSeeder(Seeder):
       init={
         "id_num": generator.Sequence(),
         "name": generator.Name(),
-        "age": generator.Integer(start=20, end=100)
+        "age": generator.Integer(start=20, end=100),
+        "gender": generator.String("(male|female)") # use the (one\|two)  pattern. Choose randomly between `male` and `female`
       }
     )
 
@@ -139,11 +141,11 @@ class DemoSeeder(Seeder):
 ```bash
 $ flask seed run
 Running database seeders
-Adding user: ID=1, Name=Fancie, Age=76
-Adding user: ID=2, Name=Shela, Age=22
-Adding user: ID=3, Name=Jo, Age=33
-Adding user: ID=4, Name=Laureen, Age=54
-Adding user: ID=5, Name=Tandy, Age=66
+Adding user: ID=1, Name=Fancie, Age=76, Gender=male
+Adding user: ID=2, Name=Shela, Age=22, Gender=female
+Adding user: ID=3, Name=Jo, Age=33, Gender=male
+Adding user: ID=4, Name=Laureen, Age=54,Gender=female
+Adding user: ID=5, Name=Tandy, Age=66, Gener=male
 DemoSeeder... [OK]
 Committing to database!
 ```
