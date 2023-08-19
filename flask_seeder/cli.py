@@ -172,7 +172,7 @@ def seed_run(root, commit, exit_on_failure, seeders):
         # pylint: disable=broad-except,invalid-name
         except Exception as e:
             click.echo("%s...\t[ERROR]" % seeder.name)
-            click.echo("\t%s" % e)
+            click.echo(traceback.format_exc())
             if exit_on_failure:
                 raise
 
