@@ -141,7 +141,7 @@ def seed():
 @click.option("--commit/--no-commit", default=True,
               help="Commit changes to database after seeding",
               envvar="FLASK_SEEDER_AUTOCOMMIT")
-@click.option("--exit-on-failure", default=False,
+@click.option("--exit-on-failure", is_flag=True,
               help="Quit when any of the seeders fail",
               envvar="FLASK_SEEDER_EXIT_ON_FAILURE")
 @click.argument("seeders", nargs=-1)
