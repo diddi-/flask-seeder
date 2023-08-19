@@ -1,4 +1,5 @@
 import os
+import pytest
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from flask import Flask
@@ -91,6 +92,17 @@ class TestSeedCLI(TestCase):
         result = self.cli.invoke(cli.seed_run)
 
         self.assertTrue("ERROR" in result.output)
+
+    @patch("flask_seeder.cli.get_seeders")
+    def test_seed_run_fails_when_requested(self, m_get_seeders):
+        class TestSeeder(Seeder):
+            def run(self):
+                raise ValueError()
+        m_get_seeders.return_value = [TestSeeder()]
+
+        result = self.cli.invoke(cli.seed_run, args=["--exit-on-failure"])
+        self.assertTrue(result.exception is not None)
+        self.assertTrue(isinstance(result.exception, ValueError))
 
     @patch("flask_seeder.cli.get_seeders")
     def test_root_option_with_list(self, m_get_seeders):

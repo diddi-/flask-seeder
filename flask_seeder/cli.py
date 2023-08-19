@@ -5,6 +5,7 @@ $ FLASK_APP=app flask seed <command>
 
 import os
 import re
+import traceback
 import importlib.util
 import inspect
 from itertools import groupby, chain
