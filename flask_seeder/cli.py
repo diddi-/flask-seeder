@@ -141,9 +141,12 @@ def seed():
 @click.option("--commit/--no-commit", default=True,
               help="Commit changes to database after seeding",
               envvar="FLASK_SEEDER_AUTOCOMMIT")
+@click.option("--exit-on-failure", default=False,
+              help="Quit when any of the seeders fail",
+              envvar="FLASK_SEEDER_EXIT_ON_FAILURE")
 @click.argument("seeders", nargs=-1)
 @with_appcontext
-def seed_run(root, commit, seeders):
+def seed_run(root, commit, exit_on_failure, seeders):
     """ Run database seeders
 
     Any optional arguments after the options will be treated as a list of seeders to run,
@@ -170,7 +173,8 @@ def seed_run(root, commit, seeders):
         except Exception as e:
             click.echo("%s...\t[ERROR]" % seeder.name)
             click.echo("\t%s" % e)
-            continue
+            if exit_on_failure:
+                raise
 
         click.echo("%s...\t[OK]" % seeder.name)
 
